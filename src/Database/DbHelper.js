@@ -1,36 +1,36 @@
 import * as SQLite from "expo-sqlite";
-import dbQueries from "./DatabaseQueries";
+import * as FileSystem from "expo-file-system";
+import { Asset } from "expo-asset";
 
 const DATABASE_NAME = "expense-manager.db";
 
 const DbHelper = {
-  init: () => {
-    // Initialize the database
-    console.log("Database initialising...");
-    // Open a connection to the database
+  init: async () => {
+    // Initialize the database connection
+    console.log("Database connection initialising...");
+
+    // Check if the database file exists in the document directory
+    const databasePath = `${FileSystem.documentDirectory}SQLite/${DATABASE_NAME}`;
+    const fileInfo = await FileSystem.getInfoAsync(databasePath);
+
+    // If the file doesn't exist, copy it from the assets folder
+    if (!fileInfo.exists) {
+      await FileSystem.makeDirectoryAsync(
+        `${FileSystem.documentDirectory}SQLite`,
+        {
+          intermediates: true,
+        }
+      );
+      await FileSystem.downloadAsync(
+        Asset.fromModule(require(`../../assets/${DATABASE_NAME}`)).uri,
+        databasePath
+      );
+    }
+
+    // Open the database connection
     const db = SQLite.openDatabase(DATABASE_NAME);
+
     return db;
-  },
-  createUserTable: (db) => {
-    // Create the user table
-    console.log("Creating user table...");
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          dbQueries.CREATE_USER_TABLE,
-          [],
-          (_, resultSet) => {
-            console.log("User table created." + resultSet.rowsAffected);
-          },
-          (_, error) => {
-            console.error("Error creating user table: ", error.message);
-          }
-        );
-      },
-      (error) => {
-        console.error("Transaction error: ", error.message);
-      }
-    );
   },
 };
 

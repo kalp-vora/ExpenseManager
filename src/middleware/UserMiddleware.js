@@ -24,12 +24,12 @@ const UserMiddleware = {
 
     UserService.register(
       newUser,
-      (onSuccess = (resultSet) => {
-        console.log(resultSet);
-      }),
-      (onError = (error) => {
-        console.error(error);
-      })
+      (resultSet) => {
+        if (onSuccess) onSuccess(resultSet.insertId);
+      },
+      (error) => {
+        if (onError) onError(error);
+      }
     );
   },
 };

@@ -10,7 +10,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./src/pages/Login";
 import Register from "./src/pages/Register";
-import openDBConnection from "./src/Database/DbHelper";
 
 const Stack = createStackNavigator();
 

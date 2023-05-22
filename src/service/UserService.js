@@ -3,7 +3,6 @@ import DbHelper from "../Database/DbHelper";
 
 const UserService = {
   register: (user, onSuccess = () => {}, onError = () => {}) => {
-    console.log("user service: ", user);
     const db = DbHelper.init();
 
     db.transaction(
@@ -18,7 +17,6 @@ const UserService = {
             user.password,
           ],
           (_, resultSet) => {
-            console.log("User inserted in database: ", resultSet.rowsAffected);
             if (onSuccess) onSuccess(resultSet);
           },
           (_, error) => {
