@@ -17,24 +17,20 @@ const UserMiddleware = {
     const newUser = {
       firstName: firstName,
       lastName: lastName,
-      contactNumber: user.contact,
+      contact: user.contact,
       email: email,
       password: user.password,
     };
 
-    UserService.register(newUser)
-      .then((data) => {
-        console.log("User registered with id: ", data);
-        if (onSuccess) {
-          onSuccess(data);
-        }
+    UserService.register(
+      newUser,
+      (onSuccess = (resultSet) => {
+        console.log(resultSet);
+      }),
+      (onError = (error) => {
+        console.error(error);
       })
-      .catch((error) => {
-        console.error("Error registering user: ", error);
-        if (onError) {
-          onError(error);
-        }
-      });
+    );
   },
 };
 

@@ -1,54 +1,37 @@
+import dbQueries from "../Database/DatabaseQueries";
 import DbHelper from "../Database/DbHelper";
-import Tables from "../Database/tables";
 
 const UserService = {
-  register: (user) => {
-    DbHelper.init()
-      .then((db) => {
-        return DbHelper.createUserTable(db);
-      })
-      .then((db) => {
-        // Insert the user into the database
-        console.log("Inserting user...");
-        return new Promise((resolve, reject) => {
-          db.transaction(
-            (tx) => {
-              tx.executeSql(
-                Tables.INSERT_USER_TABLE,
-                [
-                  user.firstName,
-                  user.lastName,
-                  user.contact,
-                  user.email,
-                  user.password,
-                ],
-                ({ insertId }) => {
-                  console.log("User inserted with id: ", insertId);
-                  resolve(insertId);
-                },
-                (error) => {
-                  console.error("Error inserting user: ", error);
-                  reject(error);
-                }
-              );
-            },
-            (error) => {
-              console.error("Transaction error: ", error);
-              reject(error);
-            }
-          );
-        });
-      })
-      .then(() => {
-        // Close the database connection
-        return DbHelper.close();
-      })
-      .then(() => {
-        console.log("Database connection closed.");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  register: (user, onSuccess = () => {}, onError = () => {}) => {
+    console.log("user service: ", user);
+    const db = DbHelper.init();
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          dbQueries.INSERT_USER_TABLE,
+          [
+            user.firstName,
+            user.lastName,
+            user.contact,
+            user.email,
+            user.password,
+          ],
+          (_, resultSet) => {
+            console.log("User inserted in database: ", resultSet.rowsAffected);
+            if (onSuccess) onSuccess(resultSet);
+          },
+          (_, error) => {
+            console.error("Error inserting user table: ", error.message);
+            if (onError) onError(error);
+          }
+        );
+      },
+      (error) => {
+        console.error("Transaction error: ", error.message);
+        if (onError) onError(error);
+      }
+    );
   },
 };
 

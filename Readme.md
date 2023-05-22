@@ -1,3 +1,3 @@
-## Expense Manager
+# Expense Manager
 
-# This app is aim to help user manage their expenses 
+## This app is aim to help user manage their expenses 

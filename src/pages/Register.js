@@ -1,17 +1,14 @@
 /**
- * This is a functional component in React Native that renders a form for user registration and updates
- * the state of the user object as the user inputs their information.
- * @returns The Register component is being returned, which contains several TextInput components for
- * the user to input their first name, last name, contact number, email, and password. The component
- * also uses the useState hook to manage the user's input values and the handleChange function to
- * update the state when the user types in the TextInput components. Finally, the component is styled
- * using the StyleSheet API.
+ * The Register function is a React component that handles user registration and input validation.
+ * @returns The Register component is being returned.
  */
+
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
-import { TextInput, View, StyleSheet, Button } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, TextInput, View, StyleSheet, Button } from "react-native";
 import Regex from "../utils/Regex";
 import UserMiddleware from "../middleware/UserMiddleware";
+import DbHelper from "../Database/DbHelper";
 
 const Register = () => {
   const navigation = useNavigation();
@@ -38,6 +35,11 @@ const Register = () => {
   const [user, setUser] = useState(initUserState);
   const [isError, setIsError] = useState(initErrorState);
 
+  useEffect(() => {
+    const db = DbHelper.init();
+    DbHelper.createUserTable(db);
+  }, []);
+
   const handleChange = (fieldName, value) => {
     setUser((previousUser) => ({ ...previousUser, [fieldName]: value }));
   };
@@ -51,15 +53,15 @@ const Register = () => {
   const validate = () => {
     let isValid = false;
     if (!Regex.NAME.test(user.firstName)) {
-      setIsError({ ...initialErrorState, firstName: true });
+      setIsError({ ...initErrorState, firstName: true });
     } else if (!Regex.NAME.test(user.lastName)) {
-      setIsError({ ...initialErrorState, lastName: true });
+      setIsError({ ...initErrorState, lastName: true });
     } else if (!Regex.EMAIL.test(user.email)) {
-      setIsError({ ...initialErrorState, email: true });
+      setIsError({ ...initErrorState, email: true });
     } else if (!Regex.CONTACT.test(user.contact)) {
-      setIsError({ ...initialErrorState, contact: true });
+      setIsError({ ...initErrorState, contact: true });
     } else if (!(user.password === user.confirmPassword)) {
-      setIsError({ ...initialErrorState, password: true });
+      setIsError({ ...initErrorState, password: true });
     } else {
       isValid = true;
     }
@@ -80,11 +82,14 @@ const Register = () => {
           console.log(response);
         }
       );
+    } else {
+      console.log("Invalid user input");
     }
   };
 
   return (
     <View style={styles.container}>
+      <Text>Register</Text>
       <TextInput
         style={styles.input}
         placeholder="First Name"
