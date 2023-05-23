@@ -16,10 +16,7 @@ const DbHelper = {
     // If the file doesn't exist, copy it from the assets folder
     if (!fileInfo.exists) {
       await FileSystem.makeDirectoryAsync(
-        `${FileSystem.documentDirectory}SQLite`,
-        {
-          intermediates: true,
-        }
+        `${FileSystem.documentDirectory}SQLite`
       );
       await FileSystem.downloadAsync(
         Asset.fromModule(require(`../../assets/${DATABASE_NAME}`)).uri,

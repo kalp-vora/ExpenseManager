@@ -123,7 +123,7 @@ const Register = () => {
           }, 1500);
         },
         (response) => {
-          console.log(response);
+          console.error(response);
         }
       );
     }

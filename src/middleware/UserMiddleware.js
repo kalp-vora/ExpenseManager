@@ -28,7 +28,20 @@ const UserMiddleware = {
         if (onSuccess) onSuccess(resultSet.insertId);
       },
       (error) => {
-        if (onError) onError(error);
+        if (onError) onError(error.message);
+      }
+    );
+  },
+  login: (user, onSuccess = () => {}, onError = () => {}) => {
+    UserService.login(
+      user,
+      (resultSet) => {
+        if (resultSet.rows.length > 0) {
+          if (onSuccess) onSuccess(true);
+        }
+      },
+      (error) => {
+        if (onError) onError(error.message);
       }
     );
   },

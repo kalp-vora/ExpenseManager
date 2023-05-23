@@ -19,30 +19,75 @@ import { View, StyleSheet, Image } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import Regex from "../utils/Regex";
 import Color from "../utils/Color";
+import UserMiddleware from "../middleware/UserMiddleware";
 
 const Login = () => {
   const navigation = useNavigation();
 
+  // Initialize the snackbar state
+  const snackbarState = {
+    show: false,
+    message: "Login successfull",
+    style: {
+      position: "absolute",
+      start: 16,
+      end: 8,
+      bottom: 16,
+      backgroundColor: Color.LOGO_GREEN,
+    },
+  };
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(snackbarState);
+
+  const navigateToHome = () => {
+    // Redirect to home page
+    // navigation.navigate("Home");
+  };
+  
+  const navigateToRegister = () => {
+    // Redirect to registration page
+    navigation.navigate("Register");
+  };
 
   const handleLogin = () => {
     // Handle login logic here, e.g., send login request to backend
     console.log("Login pressed");
-    console.log("Email:", email);
-    console.log("Password:", password);
+    console.log("Email: ", email);
+    console.log("Password: ", password);
     if (!Regex.EMAIL.test(email)) {
-      setIsEmailValid(true);
+      setIsEmailValid(false);
     }
     if (isEmailValid) {
-      console.log("Email is invalid");
+      UserMiddleware.login(
+        { email: email, password: password },
+        (loginSuccess) => {
+          if (loginSuccess) {
+            // Clear the email and password fields
+            setEmail("");
+            setPassword("");
+            // Show a snackbar
+            setIsSnackbarVisible({
+              ...isSnackbarVisible,
+              show: true,
+            });
+            // Redirect to home page
+            setTimeout(() => {
+              setIsSnackbarVisible({
+                ...isSnackbarVisible,
+                show: false,
+              });
+              navigateToHome();
+            }, 1500);
+          }
+        },
+        (response) => {
+          console.error("Login error: ", response);
+        }
+      );
     }
-  };
-
-  const navigateToRegister = () => {
-    // Redirect to registration page
-    navigation.navigate("Register");
   };
 
   return (
@@ -62,7 +107,7 @@ const Login = () => {
           style={{ marginBottom: 16 }}
           color={Color.LOGO_DARK_BLUE}
         />
-        {isEmailValid && (
+        {!isEmailValid && (
           <Text variant="body2" color={Color.LOGO_RED}>
             Please enter a valid email address
           </Text>
@@ -116,9 +161,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     margin: 16,
-  },
-  error: {
-    color: "#cf6237",
   },
 });
 
